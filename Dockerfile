@@ -2,7 +2,6 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
@@ -12,19 +11,17 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy project files
 COPY . .
 
 # 1. Upgrade pip
 # 2. Unzip main.zip
-# 3. Fix permissions for execution and writing
-# 4. Install python dependencies
+# 3. Check for requirements.txt before installing
+# 4. Set permissions
 RUN python3 -m pip install --upgrade pip && \
     unzip -o main.zip && \
-    chmod -R 755 /app && \
-    pip3 install -r requirements.txt
+    if [ -f requirements.txt ]; then pip3 install -r requirements.txt; fi && \
+    chmod -R 755 /app
 
-EXPOSE 5000
+EXPOSE 8030
 
-# Execute the application
 CMD ["python3", "app.py"]
